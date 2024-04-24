@@ -1,0 +1,98 @@
+// Screen Libraries
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SH110X.h>
+#define i2c_Address 0x3c //initialize with the I2C addr 0x3C Typically eBay OLED's
+#define SCREEN_WIDTH 128 // OLED display width, in pixels
+#define SCREEN_HEIGHT 64 // OLED display height, in pixels
+#define OLED_RESET -1   //   QT-PY / XIAO
+Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void initDisplay(){
+  display.begin(i2c_Address, true);
+  display.clearDisplay();
+  display.display();
+  display.setRotation(0);
+}
+
+int y = 15;
+void showIntro(){
+  display.setCursor(12, y);
+  display.setTextWrap(false);
+  display.setTextSize(2);
+  display.setTextColor(SH110X_WHITE);
+  display.print("Breakfast");
+  
+  display.setTextSize(2);
+  display.setCursor(4, y+20);
+  display.print("BRAIN FOOD");
+
+  display.display();
+  delay(7000);
+}
+
+ //ySpeed = 0;
+void showFact(){
+  //static ySpeed = 0;
+  display.setCursor(5, (5-ySpeed));
+  display.setTextWrap(true);
+  display.setTextSize(1);
+  display.setTextColor(SH110X_WHITE, SH110X_BLACK);
+  display.print(fact);
+  //if (fact.indexOf('.') >= 100) {delay(100); ySpeed++;} else{ySpeed = 0;}
+  display.display();
+}
+
+ 
+void showQuote(){
+  display.setCursor(5, ySpeed);
+  display.setTextWrap(true);
+  display.setTextSize(1);
+  display.setTextColor(SH110X_WHITE, SH110X_BLACK);
+  display.print(quote);
+  // if (quote.indexOf('.') >= 100) {delay(100); ySpeed++;} else{ySpeed = 0;}
+  // display.setCursor(20, 55);
+  // display.print(author);
+  display.display();
+}
+
+int firstStart = 6;   int secondStart = 420;
+int text1X = firstStart;  int textSpeed = 2;
+int text2X = secondStart;  
+
+void showSleepFact(){
+  display.setCursor(text1X,20);
+  display.setTextWrap(false);
+  display.setTextSize(4);
+  display.setTextColor(SH110X_WHITE, SH110X_BLACK);
+  display.print("BreakFAST FACTS");
+  text1X -= textSpeed;
+  if (text2X == firstStart) {text1X = secondStart;}
+
+  display.setCursor(text2X,20);
+  display.print("BreakFAST FACTS");
+  text2X -= textSpeed;
+  if (text1X == firstStart) {text2X = secondStart;}
+  
+  display.display();
+}
+
+void showSleepQuote(){
+  display.setCursor(text1X,20);
+  display.setTextWrap(false);
+  display.setTextSize(4);
+  display.setTextColor(SH110X_WHITE, SH110X_BLACK);
+  display.print("Quote Of The Day");
+  text1X -= textSpeed;
+  if (text2X == firstStart) {text1X = secondStart;}
+
+  display.setCursor(text2X,20);
+  display.print("Quote Of The Day");
+  text2X -= textSpeed;
+  if (text1X == firstStart) {text2X = secondStart;}
+  
+  display.display();
+}
+
+void clearDisplay(){display.clearDisplay();}
