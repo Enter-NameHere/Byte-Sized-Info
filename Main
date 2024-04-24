@@ -1,0 +1,38 @@
+// Setup
+const char* ssid =     // Enter ssid here 
+const char* password =       // Enter password here
+String apiUrlFacts = "https://useless-facts.sameerkumar.website/api"; // ***UPDATE THIS***
+String apiUrlQuotes = "https://zenquotes.io/api/today";
+
+// Information
+String fact = "";
+String quote = "";
+String author = "";
+
+// State Machine
+int mode = -1;
+int lastMode = -1;
+int ySpeed = 5;
+
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+
+  wifiConnect();
+  wifiRequest();
+  initDisplay();
+  initButtons();
+}
+
+void loop() {
+  checkButtons();
+  checkSleep();
+
+  switch(mode){
+    case -1: showIntro(); break;
+    case 10: showSleepFact(); break;
+    case 20: showSleepQuote(); break;
+    case 1: showFact(); break;
+    case 2: showQuote(); break;
+  }
+}
