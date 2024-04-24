@@ -1,0 +1,71 @@
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <ArduinoJson.h>
+
+// Connect to WiFi
+void wifiConnect(){
+  WiFi.begin(ssid, password);
+  Serial.println("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {delay(1000); Serial.println("Connecting...");}
+  Serial.println("Connected to the WiFi network");
+}
+
+void wifiRequest(){
+  HTTPClient httpF;
+  HTTPClient httpQ;
+  httpF.begin(apiUrlFacts);
+  httpQ.begin(apiUrlQuotes);
+  int httpFactResponseCode = httpF.GET();
+  int httpQuoteResponseCode = httpQ.GET();
+
+  if (httpFactResponseCode > 0) {
+    String payloadF = httpF.getString();
+    Serial.println("Fact API Response:");
+    Serial.println(payloadF);
+    wifiExtractFact(payloadF);
+
+  } 
+  else {
+    Serial.print("Error in HTTP request: ");
+    Serial.println(httpFactResponseCode);
+  }
+
+  if (httpQuoteResponseCode > 0) {
+    String payloadQ = httpQ.getString();
+    Serial.println("Quote API Response:");
+    Serial.println(payloadQ);
+    wifiExtractQuote(payloadQ);
+    
+  } 
+  else {
+    Serial.print("Error in HTTP request: ");
+    Serial.println(httpQuoteResponseCode);
+  }
+
+  httpF.end();
+  httpQ.end();
+}
+
+void wifiExtractFact(String payload){
+    DynamicJsonDocument doc(1024);
+    DeserializationError error = deserializeJson(doc, payload);
+    if (error) {Serial.print("deserializeJson() failed: "); Serial.println(error.c_str()); return;}
+    // Extract specific data
+    //fact = (const char*)doc["data"];
+    fact = payload.substring(8, payload.indexOf('}'));
+    Serial.print("Fact: "); Serial.println(fact);
+}
+
+void wifiExtractQuote(String payload){
+  int endQuote = payload.indexOf(':',10);
+  int endAuthor = payload.indexOf(',', endQuote);
+    DynamicJsonDocument doc(1024);
+    DeserializationError error = deserializeJson(doc, payload);
+    if (error) {Serial.print("deserializeJson() failed: "); Serial.println(error.c_str()); return;}
+    // Extract specific data
+    quote = payload.substring(7, endQuote-4); 
+    author = payload.substring(endQuote+2, endAuthor-1);
+    Serial.print("Quote: "); Serial.println(quote);
+    Serial.print("Author: "); Serial.println(author);
+}
+
